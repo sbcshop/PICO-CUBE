@@ -1,13 +1,15 @@
 from machine import Pin
-import utime
+import time
+import random
 
+LAYER = [9,8,7,6]#layers
 
-LAYER = [15,16,17,18]
+#columns
+GRID_3D = [[17, 16, 0, 1], 
+           [19, 18, 2, 3],
+           [21, 20, 4, 5],
+           [26, 22, 28, 27]]
 
-GRID_3D = [[6, 7, 13, 14],
-     [28, 8, 11, 12],
-     [9, 27, 2, 10],
-     [26, 3, 4, 22]]
 
 def enable_layer(layer):
     a = Pin(LAYER[layer])
@@ -17,30 +19,29 @@ def disable_layer(layer):
     a = Pin(LAYER[layer])
     a.off()
 
-def light_on(y, x, z):
+def light_on(y,x, z,):
     enable_layer(y)
     a = Pin(GRID_3D[x][z])
-    a.on() 
-
-def light_off(y, x, z):
+    a.on()
     
+def light_off(y, x, z):
     enable_layer(y)
     a = Pin(GRID_3D[x][z])
     a.off()
     
 
-def reset():
+def reset(t):
     for x in range(4):
         for z in range(4):
             a = Pin(GRID_3D[x][z])
             a.off()
-            utime.sleep(0.1)
+            time.sleep(t)
             
 def resetlayer():
     for i in range(0,4):
         a = Pin(LAYER[i])
         a.off()
-        utime.sleep(0.01)
+        time.sleep(0.01)
 
 for pin in LAYER:
     Pin(pin, Pin.OUT)
@@ -49,23 +50,21 @@ for x in range(4):
     for z in range(4):
         Pin(GRID_3D[x][z], Pin.OUT)
 
+
+
+while 1:
+
+    for i in range(4):
+            for j in range(4):
+                light_on(i,i,j)
+                time.sleep(0.1)
+    reset(0)
         
-reset()
-resetlayer()
+    for i in reversed(range(4)):
+            for j in reversed(range(4)):
+                light_on(i,i,j)
+                time.sleep(0.1)
+    reset(0)
 
-# Display each light in turn
-for y in range(4):
-    for x in range(4):
-        for z in range(4):
-            light_on(y, x, z)
-            utime.sleep(0.1)
-            light_off(y, x, z)
-    disable_layer(y)
 
-#Turn on all the lights
-for y in range(4):
-    enable_layer(y)
-for x in range(4):
-    for z in range(4):
-        light_on(y, x, z)
-        utime.sleep(0.25) 
+
